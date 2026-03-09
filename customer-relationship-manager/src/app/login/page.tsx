@@ -30,9 +30,9 @@ export default function LoginPage() {
     }
 
     // ✅ REDIRECT BASED ON ROLE
-    data.role === "ADMIN"
+   data.role === "ADMIN"
       ? router.push("/admin")
-      : router.push("/");
+      : router.push("/users/dashboard");
   }
 
   return (
