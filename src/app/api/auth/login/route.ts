@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcrypt";
 import { NextResponse } from "next/server";
+import { signToken } from "@/lib/jwt";
 
 export async function POST(req: Request) {
   const { email, password } = await req.json();
@@ -36,17 +37,13 @@ export async function POST(req: Request) {
     role: user.role,
   });
 
-  res.cookies.set("role", user.role, {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-  });
+const token = await signToken({ userId: user.id, role: user.role });
 
-  res.cookies.set("userId", user.id, {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-  });
+res.cookies.set("token", token, {
+  httpOnly: true,
+  sameSite: "lax",
+  secure: process.env.NODE_ENV === "production",
+});
 
   return res;
 }
