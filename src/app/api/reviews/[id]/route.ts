@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { Sentiment } from "@prisma/client"
 
 // PATCH - Update a review
 export async function PATCH(
@@ -57,22 +58,24 @@ export async function PATCH(
       );
     }
 
-    const sentimentMap: Record<number, string> = {
-      5: "EXCELLENT",
-      4: "GOOD",
-      3: "SATISFIED",
-      2: "BAD",
-      1: "POOR",
-    };
 
-    const updatedReview = await prisma.review.update({
-      where: { id },
-      data: {
-        rating: rating || existingReview.rating,
-        reviewText: reviewText || existingReview.reviewText,
-        sentiment: rating ? sentimentMap[rating] : existingReview.sentiment,
-      },
-    });
+const sentimentMap: Record<number, Sentiment> = {
+  5: "EXCELLENT",
+  4: "GOOD",
+  3: "SATISFIED",
+  2: "BAD",
+  1: "POOR",
+};
+
+const updatedReview = await prisma.review.update({
+  where: { id },
+  data: {
+    rating: rating || existingReview.rating,
+    reviewText: reviewText || existingReview.reviewText,
+    sentiment: rating ? sentimentMap[rating] : existingReview.sentiment,
+  },
+});
+
 
     return NextResponse.json(updatedReview);
   } catch (error) {
