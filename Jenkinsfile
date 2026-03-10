@@ -3,8 +3,7 @@ pipeline {
 
     environment {
         DOCKER_HUB_USER = '00sv'
-        IMAGE_NAME = 'customer-feedback-management'
-        DATABASE_URL = 'postgres://d5624c6be397fc4c3edf93df77224f8ad25de11129b418980e397a27470cba42:sk_JGLEPMXk_Yeim1atFjyoW@db.prisma.io:5432/postgres?sslmode=require'
+        IMAGE_NAME = '00sv/customer-feedback-management'
     }
 
     stages {
@@ -22,13 +21,17 @@ pipeline {
 
         stage('Build Prisma') {
             steps {
-                sh 'npx prisma generate'
+                withCredentials([usernamePassword(credentialsId: 'database-credentials', usernameVariable: 'DB_USER', passwordVariable: 'DB_PASS')]) {
+                    sh 'DATABASE_URL=postgresql://${DB_USER}:${DB_PASS}@localhost:5432/customer_feedback npx prisma generate'
+                }
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t ${IMAGE_NAME}:${BUILD_NUMBER} .'
+                withCredentials([usernamePassword(credentialsId: 'database-credentials', usernameVariable: 'DB_USER', passwordVariable: 'DB_PASS')]) {
+                    sh 'docker build --build-arg DATABASE_URL=postgresql://${DB_USER}:${DB_PASS}@localhost:5432/customer_feedback -t ${IMAGE_NAME}:${BUILD_NUMBER} .'
+                }
             }
         }
 
