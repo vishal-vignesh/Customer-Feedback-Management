@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { Sentiment } from "@prisma/client"
+import { Sentiment } from "@prisma/client";
 
 // PATCH - Update a review
 export async function PATCH(
@@ -10,36 +10,29 @@ export async function PATCH(
   try {
     const userId = req.cookies.get("userId")?.value;
     if (!userId) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { id } = await params;
     const body = await req.json();
-    const { rating, reviewText } = body;
 
-    // Verify the review exists and belongs to the user
+    const rating = Number(body.rating);
+    const reviewText = body.reviewText;
+
+    // Check existing review
     const existingReview = await prisma.review.findUnique({
       where: { id },
     });
 
     if (!existingReview) {
-      return NextResponse.json(
-        { error: "Review not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Review not found" }, { status: 404 });
     }
 
     if (existingReview.userId !== userId) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
-    // Check if review is editable (within 30 minutes)
+    // 30min edit window
     const createdAt = new Date(existingReview.createdAt);
     const now = new Date();
     const diffInMinutes = (now.getTime() - createdAt.getTime()) / (1000 * 60);
@@ -58,24 +51,23 @@ export async function PATCH(
       );
     }
 
+    // FIXED: typed sentiment enum map
+    const sentimentMap: Record<number, Sentiment> = {
+      5: "EXCELLENT",
+      4: "GOOD",
+      3: "SATISFIED",
+      2: "BAD",
+      1: "POOR",
+    };
 
-const sentimentMap: Record<number, Sentiment> = {
-  5: "EXCELLENT",
-  4: "GOOD",
-  3: "SATISFIED",
-  2: "BAD",
-  1: "POOR",
-};
-
-const updatedReview = await prisma.review.update({
-  where: { id },
-  data: {
-    rating: rating || existingReview.rating,
-    reviewText: reviewText || existingReview.reviewText,
-    sentiment: rating ? sentimentMap[rating] : existingReview.sentiment,
-  },
-});
-
+    const updatedReview = await prisma.review.update({
+      where: { id },
+      data: {
+        rating: rating || existingReview.rating,
+        reviewText: reviewText || existingReview.reviewText,
+        sentiment: rating ? sentimentMap[rating] : existingReview.sentiment,
+      },
+    });
 
     return NextResponse.json(updatedReview);
   } catch (error) {
