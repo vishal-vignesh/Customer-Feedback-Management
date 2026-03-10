@@ -4,10 +4,9 @@ import { prisma } from '@/lib/prisma';
 
 export async function GET(
   req: NextRequest,
-  context: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  // Await the params Promise
-  const { id } = await context.params;
+  const { id } = await params;
   
   try {
     const avgRating = await prisma.review.aggregate({
