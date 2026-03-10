@@ -3,9 +3,9 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET(
   req: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await context.params;
+  const { id } = await params;
 
   if (!id) {
     return NextResponse.json({ message: "ID is required" }, { status: 400 });
@@ -19,16 +19,18 @@ export async function GET(
     return NextResponse.json(product, { status: 200 });
   } catch (error) {
     console.error(error);
-    return NextResponse.json({ message: "Failed to fetch product" }, { status: 500 });
+    return NextResponse.json(
+      { message: "Failed to fetch product" },
+      { status: 500 }
+    );
   }
 }
 
 export async function DELETE(
   req: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  // Unwrap the params properly
-  const { id } = await context.params;
+  const { id } = await params;
 
   if (!id) {
     return NextResponse.json({ message: "ID is required" }, { status: 400 });
@@ -39,6 +41,9 @@ export async function DELETE(
     return NextResponse.json({ message: "Product deleted" }, { status: 200 });
   } catch (error) {
     console.error(error);
-    return NextResponse.json({ message: "Failed to delete product" }, { status: 500 });
+    return NextResponse.json(
+      { message: "Failed to delete product" },
+      { status: 500 }
+    );
   }
 }

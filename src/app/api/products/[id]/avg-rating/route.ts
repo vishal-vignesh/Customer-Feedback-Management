@@ -1,4 +1,4 @@
-// src/app/api/products/[id]/avg-rating/route.ts
+// src/app/api/products/[id]/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
@@ -9,18 +9,21 @@ export async function GET(
   const { id } = await params;
 
   try {
-    const avgRating = await prisma.review.aggregate({
-      where: { productId: id },
-      _avg: { rating: true },
+    const product = await prisma.product.findUnique({
+      where: { id },
     });
 
-    return NextResponse.json({
-      message: 'Average rating calculated',
-      data: avgRating,
-    });
+    if (!product) {
+      return NextResponse.json(
+        { message: 'Product not found' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(product);
   } catch (error) {
     return NextResponse.json(
-      { message: 'Error calculating average rating', error },
+      { message: 'Error fetching product', error },
       { status: 500 }
     );
   }
