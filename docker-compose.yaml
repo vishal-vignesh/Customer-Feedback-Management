@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgres://d5624c6be397fc4c3edf93df77224f8ad25de11129b418980e397a27470cba42:sk_JGLEPMXk_Yeim1atFjyoW@db.prisma.io:5432/postgres?sslmode=require
+      - NODE_ENV=production
+    depends_on:
+      - db
+    restart: unless-stopped
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: customer_feedback
+    volumes:
+      - ./data:/var/lib/postgresql/data
+    restart: unless-stopped
