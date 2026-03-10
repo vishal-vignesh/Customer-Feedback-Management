@@ -1,15 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { Sentiment } from "@prisma/client";
 
 // POST - Create a new review
 export async function POST(req: NextRequest) {
   try {
     const userId = req.cookies.get("userId")?.value;
     if (!userId) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await req.json();
@@ -22,14 +20,15 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (rating < 1 || rating > 5) {
+    const ratingNumber = Number(rating);
+    if (ratingNumber < 1 || ratingNumber > 5) {
       return NextResponse.json(
         { error: "Rating must be between 1 and 5" },
         { status: 400 }
       );
     }
 
-    const sentimentMap: Record<number, string> = {
+    const sentimentMap: Record<number, Sentiment> = {
       5: "EXCELLENT",
       4: "GOOD",
       3: "SATISFIED",
@@ -41,9 +40,9 @@ export async function POST(req: NextRequest) {
       data: {
         productId,
         userId,
-        rating,
+        rating: ratingNumber,
         reviewText,
-        sentiment: sentimentMap[rating],
+        sentiment: sentimentMap[ratingNumber],
       },
     });
 
@@ -52,36 +51,6 @@ export async function POST(req: NextRequest) {
     console.error("Error creating review:", error);
     return NextResponse.json(
       { error: "Failed to create review" },
-      { status: 500 }
-    );
-  }
-}
-
-// GET - Fetch reviews (with optional filtering)
-export async function GET(req: NextRequest) {
-  try {
-    const { searchParams } = new URL(req.url);
-    const productId = searchParams.get("productId");
-    const userId = searchParams.get("userId");
-
-    const where: any = {};
-    if (productId) where.productId = productId;
-    if (userId) where.userId = userId;
-
-    const reviews = await prisma.review.findMany({
-      where,
-      include: {
-        user: { select: { name: true, email: true } },
-        product: { select: { name: true } },
-      },
-      orderBy: { createdAt: "desc" },
-    });
-
-    return NextResponse.json(reviews);
-  } catch (error) {
-    console.error("Error fetching reviews:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch reviews" },
       { status: 500 }
     );
   }
