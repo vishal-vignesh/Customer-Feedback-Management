@@ -7,6 +7,7 @@ pipeline {
     }
 
     stages {
+        
         stage('Checkout') {
             steps {
                 checkout scm
@@ -19,10 +20,13 @@ pipeline {
             }
         }
 
-        stage('Build Prisma') {
+        stage('Generate Prisma Client') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'database-credentials', usernameVariable: 'DB_USER', passwordVariable: 'DB_PASS')]) {
-                    sh 'DATABASE_URL=postgresql://${DB_USER}:${DB_PASS}@localhost:5432/customer_feedback npx prisma generate'
+                    sh '''
+                        export DATABASE_URL=postgresql://${DB_USER}:${DB_PASS}@localhost:5432/customer_feedback
+                        npx prisma generate
+                    '''
                 }
             }
         }
@@ -30,7 +34,12 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'database-credentials', usernameVariable: 'DB_USER', passwordVariable: 'DB_PASS')]) {
-                    sh 'docker build --build-arg DATABASE_URL=postgresql://${DB_USER}:${DB_PASS}@localhost:5432/customer_feedback -t ${IMAGE_NAME}:${BUILD_NUMBER} .'
+                    sh '''
+                        docker build \
+                        --no-cache \
+                        --build-arg DATABASE_URL=postgresql://${DB_USER}:${DB_PASS}@localhost:5432/customer_feedback \
+                        -t ${IMAGE_NAME}:${BUILD_NUMBER} .
+                    '''
                 }
             }
         }
@@ -43,12 +52,12 @@ pipeline {
 
         stage('Push to Docker Hub') {
             steps {
-                script {
-                    withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                        sh 'echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin'
-                        sh 'docker push ${IMAGE_NAME}:${BUILD_NUMBER}'
-                        sh 'docker push ${IMAGE_NAME}:latest'
-                    }
+                withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh '''
+                        echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin
+                        docker push ${IMAGE_NAME}:${BUILD_NUMBER}
+                        docker push ${IMAGE_NAME}:latest
+                    '''
                 }
             }
         }
