@@ -30,7 +30,7 @@ export default async function Page() {
 
         <Link
           href="/admin/products/new"
-          className="bg-blue-600 text-white px-4 py-2 rounded"
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
         >
           Add Product
         </Link>

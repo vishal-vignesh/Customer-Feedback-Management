@@ -24,7 +24,7 @@ model Product {
   id          String   @id @default(uuid())
   name        String
   description String
-  price       Decimal  @default(0)
+  price       Decimal 
   imageUrl    String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -39,7 +39,7 @@ model Review {
   userId     String
   rating     Int
   reviewText String
-  sentiment  Sentiment
+  sentiment  Sentiment 
   status     ReviewStatus @default(UNRESOLVED)
   createdAt  DateTime     @default(now())
   updatedAt  DateTime     @updatedAt

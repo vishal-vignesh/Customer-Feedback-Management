@@ -1,4 +1,5 @@
 "use client";
+//for my-review page
 import { useState } from "react";
 import StarRating from "./StarRating";
 import ReviewModal from "./ReviewModal";
@@ -20,9 +21,11 @@ export default function ReviewCard({ review, onDelete, onUpdate }: ReviewCardPro
     : 0;
 
   const sentimentColors = {
-    POSITIVE: "bg-green-100 text-green-700",
-    NEUTRAL: "bg-yellow-100 text-yellow-700",
-    NEGATIVE: "bg-red-100 text-red-700",
+    EXCELLENT: "bg-green-100 text-green-700",
+    GOOD: "bg-green-100 text-green-700",
+    SATISFIED: "bg-green-100 text-green-700",
+    BAD: "bg-red-100 text-red-700",
+    POOR: "bg-red-100 text-red-700",
   };
 
   const handleDelete = async () => {
@@ -67,7 +70,7 @@ export default function ReviewCard({ review, onDelete, onUpdate }: ReviewCardPro
 
             {/* Actions */}
             <div className="flex items-center gap-2">
-              {canEdit && (
+              {canEdit && review.status === "UNRESOLVED" && (
                 <button
                   onClick={() => setShowEdit(true)}
                   className="px-3 py-1.5 text-xs font-medium border border-gray-200 rounded-lg hover:border-black hover:text-black transition-all"
@@ -77,7 +80,7 @@ export default function ReviewCard({ review, onDelete, onUpdate }: ReviewCardPro
               )}
               <button
                 onClick={handleDelete}
-                disabled={deleting}
+                // disabled={deleting}
                 className="px-3 py-1.5 text-xs font-medium border border-red-100 text-red-500 rounded-lg hover:bg-red-50 transition-all disabled:opacity-50"
               >
                 {deleting ? "..." : "Delete"}

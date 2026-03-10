@@ -22,7 +22,7 @@ export interface Review {
   productId: string;
   rating: number;
   reviewText: string;
-  sentiment: "POSITIVE" | "NEUTRAL" | "NEGATIVE";
+  sentiment: "EXCELLENT" | "GOOD" | "SATISFIED" | "BAD" | "POOR";
   status: "RESOLVED" | "UNRESOLVED";
   createdAt: string;
   editableUntil: string;

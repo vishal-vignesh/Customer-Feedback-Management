@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import StatsBar from "../../../components/users/StatsBar";
 import { Review } from "../types";
 
+export const dynamic = "force-dynamic";
 export default function UserDashboardPage() {
   const router = useRouter();
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -98,7 +99,7 @@ const fetchData = useCallback(async () => {
                         ? "bg-green-100 text-green-700"
                         : "bg-gray-100 text-gray-500"
                     }`}>
-                      {review.responses.length > 0 ? "Responded" : "Pending"}
+                      {review.responses.length > 0 ? "Resolved" : "Unresolved"}
                     </span>
                   </div>
                 </div>

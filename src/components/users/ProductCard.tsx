@@ -41,10 +41,10 @@ export default function ProductCard({ product, userReview, onReviewUpdate }: Pro
 
           {/* Rating Row */}
           <div className="flex items-center gap-2 mt-3 pb-3 border-b border-gray-100">
-            <StarRating rating={Math.round(product.avgRating)} readonly size="sm" />
+            {/* <StarRating rating={Math.round(product.avgRating)} readonly size="sm" />
             <span className="text-gray-400 text-xs">
               {product.totalReviews === 0 ? "No reviews yet" : `${product.totalReviews} review${product.totalReviews > 1 ? "s" : ""}`}
-            </span>
+            </span> */}
           </div>
 
           {/* User Review Status */}

@@ -20,6 +20,6 @@ export const reviews: Review[] = [
     product: "Laptop",
     rating: 2,
     message: "Battery bad",
-    status: "In Progress",
+    status: "Resolved",
   },
 ];

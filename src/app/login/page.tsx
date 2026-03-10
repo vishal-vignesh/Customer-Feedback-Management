@@ -22,14 +22,11 @@ export default function LoginPage() {
       alert(data.error);
       return;
     }
-
-    // 🔐 FINAL CHECK (SECURE)
     if (loginAs === "ADMIN" && data.role !== "ADMIN") {
       alert("You are not authorized as Admin");
       return;
     }
 
-    // ✅ REDIRECT BASED ON ROLE
     data.role === "ADMIN"
       ? router.push("/admin")
       : router.push("/users/dashboard");

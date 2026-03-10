@@ -1,36 +1,51 @@
-import "dotenv/config";
-import { PrismaClient, Role } from "@prisma/client";
-import { PrismaPg } from "@prisma/adapter-pg";
-import bcrypt from "bcrypt";
-import pg from "pg";
+import { Sentiment, ReviewStatus } from "@prisma/client";
+import { prisma } from "../lib/prisma";
 
-const pool = new pg.Pool({
-  connectionString: process.env.DATABASE_URL,
-});
-
-const adapter = new PrismaPg(pool);
-const prisma = new PrismaClient({ adapter });
-
+ 
 async function main() {
-  const hashedPassword = await bcrypt.hash("admin123", 10);
-
-  await prisma.user.upsert({
-    where: { email: "admin@crm.com" },
-    update: {},
-    create: {
-      name: "admin",
-      email: "admin@crm.com",
-      password: hashedPassword,
-      role: Role.ADMIN,
-    },
+ 
+  const product1 = "b24a4577-0e2b-4d5d-9db7-c10be4216081";
+  const product2 = "f2b29055-12d2-4e55-8bf5-5c7bc9f5ea5b";
+  const user1 = "114553dd-4c66-4d62-ac13-24ad41ddfa0d";
+ 
+  await prisma.review.createMany({
+    data: [
+      {
+        productId: product1,
+        userId: user1,
+        rating: 5,
+        reviewText: "Amazing product, highly recommend!",
+        sentiment: Sentiment.EXCELLENT,
+        status: ReviewStatus.UNRESOLVED
+      },
+      {
+        productId: product1,
+        userId: user1,
+        rating: 4,
+        reviewText: "Good quality but delivery was slow.",
+        sentiment: Sentiment.GOOD,
+        status: ReviewStatus.UNRESOLVED
+      },
+      {
+        productId: product2,
+        userId: user1,
+        rating: 2,
+        reviewText: "Not satisfied with the product.",
+        sentiment: Sentiment.BAD,
+        status: ReviewStatus.UNRESOLVED
+      }
+    ]
   });
-
-  console.log("✅ Admin user created");
+ 
+  console.log("Reviews seeded successfully");
 }
-
+ 
 main()
-  .catch(console.error)
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  })
   .finally(async () => {
     await prisma.$disconnect();
-    await pool.end();
   });
+ 

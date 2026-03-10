@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 const items = [
   { name: "Dashboard", path: "/admin" },
   { name: "Products", path: "/admin/products" },
-  { name: "Reviews", path: "/admin/reviews" },
+  // { name: "Reviews", path: "/admin/reviews" },
 ];
 
 export default function Sidebar() {
@@ -19,8 +19,10 @@ export default function Sidebar() {
         <Link
           key={i.path}
           href={i.path}
-          className={`block p-2 rounded mb-2 ${
-            path === i.path ? "bg-blue-600" : "hover:bg-gray-800"
+          className={`block p-3 rounded-xl mb-2 transition-all duration-200 ${
+            path === i.path 
+              ? "bg-blue-600 text-white shadow-lg" 
+              : "hover:bg-gray-800 text-gray-300 hover:text-white"
           }`}
         >
           {i.name}
