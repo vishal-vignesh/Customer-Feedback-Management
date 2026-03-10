@@ -13,9 +13,6 @@ COPY . .
 
 ENV DATABASE_URL=${DATABASE_URL}
 
-# ✨ FIX: remove stale prisma client
-RUN rm -rf node_modules/@prisma
-
 # Generate fresh prisma client with engineType = "binary"
 RUN npx prisma generate
 
