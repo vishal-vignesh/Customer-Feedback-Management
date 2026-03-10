@@ -1,26 +1,28 @@
-import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+// src/app/api/products/[id]/avg-rating/route.ts
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
 
 export async function GET(
   req: NextRequest,
-  context: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
+  // Await the params Promise
   const { id } = await context.params;
-
-  if (!id) {
-    return NextResponse.json({ message: "ID is required" }, { status: 400 });
-  }
-
+  
   try {
     const avgRating = await prisma.review.aggregate({
       where: { productId: id },
-      _avg: {
-        rating: true
-      }
+      _avg: { rating: true },
     });
-    return NextResponse.json(avgRating, { status: 200 });
+
+    return NextResponse.json({
+      message: 'Average rating calculated',
+      data: avgRating,
+    });
   } catch (error) {
-    console.error(error);
-    return NextResponse.json({ message: "Failed to fetch average rating" }, { status: 500 });
+    return NextResponse.json(
+      { message: 'Error calculating average rating', error },
+      { status: 500 }
+    );
   }
 }
