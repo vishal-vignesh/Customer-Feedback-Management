@@ -1,0 +1,4 @@
+1 jenkins
+2 build docker
+3 push to docker hub
+4 pull and deploy
